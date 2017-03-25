@@ -1,0 +1,14 @@
+#main {
+    text-align: center;
+    margin: 10% auto auto;
+}
+
+#main p {
+    font-family: 'Source Sans Pro', sans-serif;
+    color: #333;
+}
+
+html, body {
+    background-color: #e7e7e7;
+}
+

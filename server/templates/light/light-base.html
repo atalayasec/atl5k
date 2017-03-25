@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    {% block stylesheets %}
+    <link rel="stylesheet" href="/static/font-awesome-4.5.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/static/css/spinner.css" />
+    <link rel="stylesheet" href="/static/css/global.css" />
+    <link rel="stylesheet" href="/static/css/light-base.css" />
+    {% endblock stylesheets %}
+</head>
+<body>
+    {% block content %}{% endblock content %}
+
+    {% include 'light/light-footer.html' %}
+
+    {% block javascript %}
+    <script src="/static/js/jquery.min.js"></script>
+    {% endblock javascript %}
+</body>
+</html>

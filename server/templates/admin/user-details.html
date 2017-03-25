@@ -1,0 +1,112 @@
+{% extends 'admin/admin-base.html' %}
+{% block content %}
+
+    {% set active_page = 'iser' %}
+    {% include 'admin/navbar.html' with context %}
+    <div class="wrapper wrapper-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-heading">
+                            <div class="ibox-title">
+                                <a href="/"><i class="fa fa-angle-left"></i> Return to dashboard</a><br/>
+                                <h1>Change password</h1>
+                            </div>
+                        </div>
+                        <div class="ibox-content">
+                            <form class="form-horizontal" action="/change-password" method="POST">
+                                <div class="form-group">
+                                    <label for="new-password" class="col-sm-3 control-label">New password</label>
+                                    <div class="col-sm-4">
+                                        <input type="password" class="form-control" id="new-password" name="new-password">
+                                    </div>
+                                    <div class="col-sm-5 danger" id="password-empty-label">
+                                        The password must not be empty
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirm-password" class="col-sm-3 control-label">Confirm new password</label>
+                                    <div class="col-sm-4">
+                                        <input type="password" class="form-control" id="confirm-password" name="confirm-password">
+                                    </div>
+                                    <div class="col-sm-5 danger" id="password-match-label">
+                                        The two passwords do not match
+                                    </div>
+                                </div>
+                                <input type="hidden" name="md5password"/>
+                                <input type="hidden" name="md5confirm"/>
+                                <div class="form-group">
+                                    <div class="col-sm-7">
+                                        <button type="submit" class="btn btn-primary btn-lg pull-right">
+                                            Change password &nbsp;<i class="fa fa-shield"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+    {{ super() }}
+    <script>
+        $(document).ready(function () {
+            var newPassword = $('#new-password');
+            var confirmPassword = $('#confirm-password');
+            var matchLabel = $('#password-match-label');
+            var emptyLabel = $('#password-empty-label');
+
+            matchLabel.hide();
+            emptyLabel.hide();
+
+            function checkPasswordsMatch() {
+
+                if (newPassword.val() !== '') {
+                    emptyLabel.hide();
+                }
+
+                if (newPassword.val() !== confirmPassword.val()) {
+                    matchLabel.show();
+                    return false;
+                } else {
+                    matchLabel.hide();
+                    return true;
+                }
+            }
+
+            newPassword.keyup(checkPasswordsMatch);
+            confirmPassword.keyup(checkPasswordsMatch);
+
+            $('form').submit(function(event) {
+
+                if (newPassword.val() === '') {
+                    emptyLabel.show();
+                    event.preventDefault();
+                    return false;
+                }
+
+                if (!checkPasswordsMatch()) {
+                    event.preventDefault();
+                    return false;
+                }
+
+
+                newPassword.removeAttr('name');
+                $('[name=md5password]').val(md5(newPassword.val()));
+
+                confirmPassword.removeAttr('name');
+                $('[name=md5confirm]').val(md5(confirmPassword.val()));
+
+                return true;
+
+            });
+
+        });
+    </script>
+{% endblock %}

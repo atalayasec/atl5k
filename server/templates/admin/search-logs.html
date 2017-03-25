@@ -1,0 +1,205 @@
+{% extends 'admin/admin-base.html' %}
+{% block content %}
+
+    {% set active_page = 'logs' %}
+    {% include 'admin/navbar.html' with context %}
+    <div class="wrapper wrapper-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-heading">
+                            <div class="ibox-title">
+                                <a href="/"><i class="fa fa-angle-left"></i> Return to config</a><br/>
+                                <h1>Search in logs</h1>
+                            </div>
+                        </div>
+                        <div class="ibox-content">
+                            <form class="form-horizontal">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label for="dhcpOnOff" class="col-sm-4 control-label">
+                                                Search by text
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="switch">
+                                                    <div class="onoffswitch">
+                                                        <input type="checkbox" class="onoffswitch-checkbox"
+                                                               id="searchByText" name="searchByText">
+                                                        <label class="onoffswitch-label" for="searchByText">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 control-label">
+                                                Text to search<br/> (case insensitive)
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <label>
+                                                    <input disabled class="form-control" type="text"
+                                                           name="string" id="string"/>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label for="dhcpOnOff" class="col-sm-4 control-label">
+                                                Search by date
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="switch">
+                                                    <div class="onoffswitch">
+                                                        <input type="checkbox" class="onoffswitch-checkbox"
+                                                               id="searchByDate" name="searchByDate">
+                                                        <label class="onoffswitch-label" for="searchByDate">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="dhcpOnOff" class="col-sm-4 control-label">
+                                                Search period
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="input-daterange input-group" id="datepicker"
+                                                     data-date-format="dd/mm/yyyy">
+                                                    <input type="text" class="input-sm form-control" disabled
+                                                           name="start" id="from"/>
+                                                    <span class="input-group-addon">to</span>
+                                                    <input type="text" class="input-sm form-control" disabled
+                                                           name="end" id="to"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group text-center">
+                                    <button class="btn btn-primary" type="button" id="submitSearch">Search
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="ibox-content">
+                            <table class="table" id="eventsTable"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block javascript %}
+    {{ super() }}
+    <script src="static/js/bootstrap-datepicker.js"></script>
+    <script src="static/js/daterangepicker.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var now = new Date();
+            var todayString = [now.getDate(), now.getMonth() + 1, now.getFullYear()].join('/');
+            var searchBtn = $('#submitSearch');
+
+            $('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green',
+                radioClass: 'iradio_square-green'
+            });
+
+            $('#from, #to').val(todayString);
+
+            $('.input-daterange').datepicker({
+                keyboardNavigation: false,
+                autoclose: true,
+                format: 'dd/mm/yyyy'
+            });
+
+            $('#searchByText').change(function (e) {
+                var checkbox = e.target;
+                $('#string').attr('disabled', !checkbox.checked);
+            });
+
+            $('#searchByDate').change(function (e) {
+                var checkbox = e.target;
+                $('.input-daterange').find('input').attr('disabled', !checkbox.checked);
+            });
+
+            searchBtn.click(search);
+        });
+
+        var table = false;
+
+        function search(event) {
+            var searchBtn = $(event.target);
+            var resultsContainer = $('#eventsTable');
+            var searchParams = {};
+            var searchByText = $('#searchByText').prop('checked');
+            var searchByDate = $('#searchByDate').prop('checked');
+
+            if (searchByText) {
+                searchParams.string = $('#string').val();
+            }
+
+            if (searchByDate) {
+                searchParams.from = getTimestampFromEUFormat($('#from').val());
+                searchParams.to = getTimestampFromEUFormat($('#to').val()) + 60 * 60 * 24 * 1000;
+            }
+
+            if (table) {
+                table.clear();
+                table.destroy();
+            }
+
+            searchBtn.attr('disabled', true);
+
+            $.ajax({
+                url: '/logs',
+                method: 'GET',
+                data: searchParams,
+                success: function (res) {
+                    table = resultsContainer.DataTable({
+                        data: JSON.parse(res),
+                        columns: [
+                            {
+                                data: 'moment', title: 'Moment', render: function (timestamp) {
+                                return new Date(timestamp);
+                            }
+                            },
+                            {data: 'body', title: 'Text'},
+                            {data: 'level', title: 'Level'}
+                        ]
+                    });
+                    searchBtn.attr('disabled', false);
+                },
+                error: function (err) {
+                    console.log(err);
+                    searchBtn.attr('disabled', false);
+                }
+            });
+        }
+
+        function getTimestampFromEUFormat(str) {
+            var tmp = str.split('/');
+            var final_str = [tmp[2], tmp[1], tmp[0]];
+            return new Date(final_str).getTime()
+        }
+
+    </script>
+{% endblock javascript %}
+
+{% block stylesheets %}
+    {{ super() }}
+    <link rel="stylesheet" href="static/css/datepicker3.css"/>
+    <link rel="stylesheet" href="static/css/daterangepicker-bs3.css"/>
+{% endblock stylesheets %}

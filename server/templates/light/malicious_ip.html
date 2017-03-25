@@ -1,0 +1,27 @@
+{% extends 'light/light-base.html' %}
+{% block content %}
+<div id="main">
+    <img id="logo" src="/static/images/logo-black.png" />
+    <h1 class="danger">
+        <i class="fa fa-warning"></i> Warning
+    </h1>
+    <p>
+        A warning message relative to the {{ ip }} ip.
+    </p>
+    <a href="#" class="btn btn-lg btn-danger" id="whitelistIpBtn">Whitelist {{ ip }}</a>
+</div>
+{% endblock %}
+
+{% block javascript %}
+    {{ super() }}
+    <script type="text/javascript">
+        document.getElementById('whitelistIpBtn').addEventListener('click', function(event) {
+            event.preventDefault();
+            $.post('/whitelist/ip', { ip: '{{ ip }}' })
+                    .success(function() {
+                        window.location = '{{ request_url }}'
+                    })
+                    .error(function(err) {});
+        });
+    </script>
+{% endblock javascript %}

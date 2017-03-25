@@ -1,0 +1,6 @@
+
+{% if host_configuration['HTTPSEnabled'] %}
+https_port {{ host_configuration['proxyPort'] }} cert={{ certificate_path }}
+{% else %}
+http_port {{ host_configuration['proxyPort'] }}
+{% endif %}

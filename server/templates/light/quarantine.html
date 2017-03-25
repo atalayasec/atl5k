@@ -1,0 +1,56 @@
+{% extends 'light/light-base.html' %}
+
+{% block content %}
+<div id="main">
+    <img id="logo" src="/static/images/logo-black.png" />
+    <p>
+        Please wait a moment while the file is being analyzed.<br/>
+        When finished, <strong>the download will start automatically</strong>.
+    </p>
+    <div>
+        <div class="sk-cube-grid">
+            <div class="sk-cube sk-cube1"></div>
+            <div class="sk-cube sk-cube2"></div>
+            <div class="sk-cube sk-cube3"></div>
+            <div class="sk-cube sk-cube4"></div>
+            <div class="sk-cube sk-cube5"></div>
+            <div class="sk-cube sk-cube6"></div>
+            <div class="sk-cube sk-cube7"></div>
+            <div class="sk-cube sk-cube8"></div>
+            <div class="sk-cube sk-cube9"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{{ super() }}
+
+    <script type="text/javascript">
+        var checkInterval = 10000;
+
+        $.urlParam = function (name) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            return results[1] || 0;
+        };
+
+        var interval = setInterval(function () {
+            $.get('/check?md5=' + $.urlParam('md5'))
+                    .success(function (res) {
+                        console.log(res);
+                        switch (res) {
+                            case 'clean':
+                                clearInterval(interval);
+                                window.location = '/static/tmp/' + $.urlParam('filename');
+                                break;
+                            case 'malicious':
+                                clearInterval(interval);
+                                window.location = 'https://sandbox.deepviz.com/report/hash/' + $.urlParam('md5');
+                                break;
+                            case 'checking':
+                                break;
+                        }
+                    });
+        }, checkInterval);
+    </script>
+{% endblock javascript %}

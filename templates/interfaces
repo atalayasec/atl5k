@@ -1,0 +1,35 @@
+auto lo
+iface lo inet loopback
+
+auto eth0
+{% if eth0.static %}
+iface eth0 inet static
+    address {{ eth0.ip }}
+    netmask {{ eth0.netmask }}
+    gateway {{ eth0.gateway }}
+{% if dns1 or dns2 %}
+    dns-nameservers {{ dns1 }} {{ dns2 }}
+{% endif %}
+{% else %}
+iface eth0 inet dhcp
+{% endif %}
+
+
+auto eth1
+    {% if not eth1.has_addr %}
+iface eth1 inet manual
+    {% elif eth1.static %}
+iface eth1 inet static
+    address {{ eth1.ip }}
+    netmask {{ eth1.netmask }}
+    gateway {{ eth1.gateway }}
+    {% endif %}
+    post-up ethtool -K eth1 tso off
+    post-up ethtool -K eth1 gro off
+    post-up ethtool -K eth1 lro off
+    post-up ethtool -K eth1 gso off
+    post-up ethtool -K eth1 rx off
+    post-up ethtool -K eth1 tx off
+    post-up ethtool -K eth1 sg off
+    post-up ethtool -K eth1 rxvlan off
+    post-up ethtool -K eth1 txvlan off

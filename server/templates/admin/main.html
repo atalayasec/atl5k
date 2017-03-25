@@ -1,0 +1,660 @@
+{% extends 'admin/admin-base.html' %}
+
+{% block content %}
+    {% set active_page = 'dashboard' %}
+    {% include 'admin/navbar.html' with context %}
+    <div class="wrapper wrapper-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-heading">
+                            <div class="ibox-title">
+                                <h1>Router Configuration</h1>
+                            </div>
+                        </div>
+                        <form class="form-horizontal" method="post" action="/configuration"
+                              enctype="multipart/form-data">
+
+
+                            <div class="ibox-content">
+
+
+                                <h2>Remote Analyser Configuration</h2>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Virustotal API Key</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="virustotal_api_key"
+                                               value="{{ host_configuration.virustotal_api_key }}">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Sandbox Username</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="sandbox_username"
+                                               value="{{ host_configuration.sandbox_username }}">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Sandbox Password</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="sandbox_password"
+                                               value="{{ host_configuration.sandbox_password }}">
+                                    </div>
+                                </div>
+                                <h2>Network interfaces</h2>
+
+
+                                <div class="row">
+
+                                    <div class="col-sm-3 text-right">
+                                        <h3>Interface 0</h3>
+                                    </div>
+                                    <div class="col-sm8">
+                                        <hr/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="eth0_dhcp" class="col-sm-3 control-label">
+                                        Dynamic address
+                                    </label>
+                                    <div class="col-sm-9">
+                                        <div class="switch">
+                                            <div class="onoffswitch">
+                                                {% set dhcp = host_configuration.eth0_dhcp_enabled %}
+                                                <input type="checkbox"
+                                                        {{ ' checked ' if dhcp }}
+                                                       class="onoffswitch-checkbox"
+                                                       id="eth0_dhcp" name="eth0_dhcp">
+                                                <label class="onoffswitch-label" for="eth0_dhcp">
+                                                    <span class="onoffswitch-inner"></span>
+                                                    <span class="onoffswitch-switch"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-sm-9 col-sm-offset-3">
+                                        {% if dhcp %}
+                                            <p>Or you can renew the DHCP lease by clicking on this button</p>
+                                            <button type="button" id="renew_eth0_dhcp" class="btn btn-primary">
+                                                <i class="fa fa-refresh"></i> Renew DHCP
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">IP address</label>
+                                    <div class="col-sm-9">
+                                        {% set ip = host_configuration.eth0_ip.split('.') if host_configuration.eth0_ip else False %}
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth0_ip_1" {{ 'disabled' if dhcp }}
+                                               value="{{ ip[0] if ip }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth0_ip_2" {{ 'disabled' if dhcp }}
+                                               value="{{ ip[1] if ip }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth0_ip_3" {{ 'disabled' if dhcp }}
+                                               value="{{ ip[2] if ip }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth0_ip_4" {{ 'disabled' if dhcp }}
+                                               value="{{ ip[3] if ip }}">
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Netmask</label>
+                                    <div class="col-sm-9">
+                                        {% set netmask = host_configuration.eth0_netmask.split('.') if host_configuration.eth0_netmask else False %}
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth0_nm_1" {{ 'disabled' if dhcp }}
+                                               value="{{ netmask[0] if netmask }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth0_nm_2" {{ 'disabled' if dhcp }}
+                                               value="{{ netmask[1] if netmask }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth0_nm_3" {{ 'disabled' if dhcp }}
+                                               value="{{ netmask[2] if netmask }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth0_nm_4" {{ 'disabled' if dhcp }}
+                                               value="{{ netmask[3] if netmask }}">
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Gateway</label>
+                                    <div class="col-sm-9">
+                                        {% set gw = host_configuration.eth0_gw.split('.') if host_configuration.eth0_gw else False %}
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth0_gw_1" {{ 'disabled' if dhcp }}
+                                               value="{{ gw[0] if gw }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth0_gw_2" {{ 'disabled' if dhcp }}
+                                               value="{{ gw[1] if gw }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth0_gw_3" {{ 'disabled' if dhcp }}
+                                               value="{{ gw[2] if gw }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth0_gw_4" {{ 'disabled' if dhcp }}
+                                               value="{{ gw[3] if gw }}">
+                                    </div>
+                                </div>
+
+                            <div class="form-group">
+                                    <label for="gateway" class="col-sm-3 control-label">Primary DNS</label>
+                                    <div class="col-sm-9">
+                                        {% set dns1 = host_configuration.dns1.split('.') if host_configuration.dns1 else False %}
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="dns1-1" value="{{ dns1[0] if dns1 }}" {{ 'disabled' if dhcp }}>.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="dns1-2" value="{{ dns1[1] if dns1 }}" {{ 'disabled' if dhcp }}>.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="dns1-3" value="{{ dns1[2] if dns1 }}" {{ 'disabled' if dhcp }}>.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="dns1-4" value="{{ dns1[3] if dns1 }}" {{ 'disabled' if dhcp }}>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label for="dns2-" class="col-sm-3 control-label">Secondary DNS</label>
+                                    <div class="col-sm-9">
+                                        {% set dns2 = host_configuration.dns2.split('.') if host_configuration.dns2 else False %}
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="dns2-1" value="{{ dns2[0] if dns2 }}" {{ 'disabled' if dhcp }}>.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="dns2-2" value="{{ dns2[1] if dns2 }}" {{ 'disabled' if dhcp }}>.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="dns2-3" value="{{ dns2[2] if dns2 }}" {{ 'disabled' if dhcp }}>.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="dns2-4" value="{{ dns2[3] if dns2 }}" {{ 'disabled' if dhcp }}>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+
+                                    <div class="col-sm-3 text-right">
+                                        <h3>Interface 1</h3>
+                                    </div>
+                                    <div class="col-sm8">
+                                        <hr/>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label for="eth1_has_addr" class="col-sm-3 control-label">
+                                        Assign address
+                                    </label>
+                                    <div class="col-sm-9">
+                                        <div class="switch">
+                                            <div class="onoffswitch">
+                                                {% set eth1_has_addr = host_configuration.eth1_has_addr %}
+                                                <input type="checkbox"
+                                                        {{ ' checked ' if eth1_has_addr }}
+                                                       class="onoffswitch-checkbox"
+                                                       id="eth1_has_addr" name="eth1_has_addr">
+                                                <label class="onoffswitch-label" for="eth1_has_addr">
+                                                    <span class="onoffswitch-inner"></span>
+                                                    <span class="onoffswitch-switch"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">IP address</label>
+                                    <div class="col-sm-9">
+                                        {% set ip = host_configuration.eth1_ip.split('.') if host_configuration.eth1_ip else False %}
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth1_ip_1" {{ 'disabled' if not eth1_has_addr }}
+                                               value="{{ ip[0] if ip }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth1_ip_2" {{ 'disabled' if not eth1_has_addr }}
+                                               value="{{ ip[1] if ip }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth1_ip_3" {{ 'disabled' if not eth1_has_addr }}
+                                               value="{{ ip[2] if ip }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth1_ip_4" {{ 'disabled' if not eth1_has_addr }}
+                                               value="{{ ip[3] if ip }}">
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Netmask</label>
+                                    <div class="col-sm-9">
+                                        {% set netmask = host_configuration.eth1_netmask.split('.') if host_configuration.eth1_netmask else False %}
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth1_nm_1" {{ 'disabled' if not eth1_has_addr }}
+                                               value="{{ netmask[0] if netmask }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth1_nm_2" {{ 'disabled' if not eth1_has_addr }}
+                                               value="{{ netmask[1] if netmask }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth1_nm_3" {{ 'disabled' if not eth1_has_addr }}
+                                               value="{{ netmask[2] if netmask }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth1_nm_4" {{ 'disabled' if not eth1_has_addr }}
+                                               value="{{ netmask[3] if netmask }}">
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label for="gateway" class="col-sm-3 control-label">Gateway</label>
+                                    <div class="col-sm-9">
+                                        {% set gw = host_configuration.eth1_gw.split('.') if host_configuration.eth1_gw else False %}
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth1_gw_1" {{ 'disabled' if not eth1_has_addr }}
+                                               value="{{ gw[0] if gw }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth1_gw_2" {{ 'disabled' if not eth1_has_addr }}
+                                               value="{{ gw[1] if gw }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth1_gw_3" {{ 'disabled' if not eth1_has_addr }}
+                                               value="{{ gw[2] if gw }}">.
+                                        <input type="number" min=0 max=255 class="form-control ip-piece"
+                                               name="eth1_gw_4" {{ 'disabled' if not eth1_has_addr }}
+                                               value="{{ gw[3] if gw }}">
+                                    </div>
+                                </div>
+
+
+
+                                <h2>Proxy</h2>
+
+
+                                <div class="form-group">
+                                    <label for="proxyOnOff" class="col-sm-3 control-label">Service
+                                        status</label>
+                                    <div class="col-sm-9">
+                                        <div class="switch">
+                                            <div class="onoffswitch">
+                                                <input type="checkbox"
+                                                        {{ ' checked ' if host_configuration.proxyEnabled }}
+                                                       class="onoffswitch-checkbox"
+                                                       id="proxyOnOff" name="proxyOnOff">
+                                                <label class="onoffswitch-label" for="proxyOnOff">
+                                                    <span class="onoffswitch-inner"></span>
+                                                    <span class="onoffswitch-switch"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label for="proxyHTTPS" class="col-sm-3 control-label">HTTPS</label>
+                                    <div class="col-sm-9">
+                                        <div class="switch">
+                                            <div class="onoffswitch">
+                                                <input type="checkbox"
+                                                        {{ ' checked ' if host_configuration.HTTPSEnabled }}
+                                                       class="onoffswitch-checkbox"
+                                                       id="proxyHTTPS" name="proxyHTTPS">
+                                                <label class="onoffswitch-label" for="proxyHTTPS">
+                                                    <span class="onoffswitch-inner"></span>
+                                                    <span class="onoffswitch-switch"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="proxyHTTPS" class="col-sm-3 control-label">HTTPS Certificate</label>
+                                    {% if host_configuration['HTTPSCertificate'] %}
+                                        <section id="noCertBlock">
+                                            <a class="btn btn-primary" href="/httpscert">
+                                                Download
+                                            </a>
+                                            <button class="btn btn-danger" type="button"
+                                                    id="removeCertificate">Rimuovi
+                                            </button>
+                                        </section>
+                                        <div class="col-sm-9" id="certBlock" hidden>
+                                            <input type="file" name="HTTPSCertificate"/>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-sm-9">
+                                            <input type="file" name="HTTPSCertificate"/>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label for="proxyPort" class="col-sm-3 control-label">Port</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" id="proxyPort"
+                                               placeholder="" value="{{ host_configuration.proxyPort }}"
+                                               name="proxyPort">
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Mode</label>
+                                    <div class="col-sm-6">
+                                        <div class="i-checks"><label>
+                                            <input type="radio" value="block" name="proxyMode"
+                                                    {{ ' checked ' if host_configuration.proxyMode == 'block' or not host_configuration.proxyMode }}>
+                                            <i></i> Block </label>
+                                        </div>
+                                        <div class="i-checks"><label>
+                                            <input type="radio" value="monitor" name="proxyMode"
+                                                    {{ ' checked ' if host_configuration.proxyMode == 'monitor' }} >
+                                            <i></i> Monitor </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <h2>Suricata</h2>
+
+
+                                <div class="form-group">
+                                    <label for="suricataOnOff" class="col-sm-3 control-label">Service
+                                        status</label>
+                                    <div class="col-sm-9">
+                                        <div class="switch">
+                                            <div class="onoffswitch">
+                                                <input type="checkbox"
+                                                        {{ ' checked ' if host_configuration.suricataEnabled }}
+                                                       class="onoffswitch-checkbox"
+                                                       id="suricataOnOff" name="suricataOnOff">
+                                                <label class="onoffswitch-label" for="suricataOnOff">
+                                                    <span class="onoffswitch-inner"></span>
+                                                    <span class="onoffswitch-switch"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="suricata_upload_mode" class="col-sm-3 control-label">Upload unknown files
+                                        files</label>
+                                    <div class="col-sm-9">
+                                        <div class="switch">
+                                            <div class="onoffswitch">
+                                                <input type="checkbox"
+                                                        {{ ' checked ' if host_configuration.suricata_upload_mode }}
+                                                       class="onoffswitch-checkbox"
+                                                       id="suricata_upload_mode" name="suricata_upload_mode">
+                                                <label class="onoffswitch-label" for="suricata_upload_mode">
+                                                    <span class="onoffswitch-inner"></span>
+                                                    <span class="onoffswitch-switch"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            
+                            
+                                <h2>IPTables</h2>
+                            
+                            
+                                <div class="form-group">
+                                    <label for="iptables_forward_enabled" class="col-sm-3 control-label">Natting</label>
+                                    <div class="col-sm-9">
+                                        <div class="switch">
+                                            <div class="onoffswitch">
+                                                <input type="checkbox"
+                                                        {{ ' checked ' if host_configuration.iptables_forward_enabled }}
+                                                       class="onoffswitch-checkbox"
+                                                       id="iptables_forward_enabled" name="iptables_forward_enabled">
+                                                <label class="onoffswitch-label" for="iptables_forward_enabled">
+                                                    <span class="onoffswitch-inner"></span>
+                                                    <span class="onoffswitch-switch"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h2>Remote Syslog Logging</h2>
+ 
+                                <div class="form-group">
+                                    <label for="syslogEnabled" class="col-sm-3 control-label">Enable remote syslog</label>
+                                    <div class="col-sm-9">
+                                        <div class="switch">
+                                            <div class="onoffswitch">
+                                                <input type="checkbox"
+                                                        {{ ' checked ' if host_configuration.syslogEnabled }}
+                                                       class="onoffswitch-checkbox"
+                                                       id="syslogEnabled" name="syslogEnabled">
+                                                <label class="onoffswitch-label" for="syslogEnabled">
+                                                    <span class="onoffswitch-inner"></span>
+                                                    <span class="onoffswitch-switch"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                           
+                                <div class="form-group">
+                                    <label for="syslogHost" class="col-sm-3 control-label">Host</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" id="syslogHost"
+                                               placeholder="" value="{{ host_configuration.syslogHost }}"
+                                               name="syslogHost">
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label for="syslogPort" class="col-sm-3 control-label">Port</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" id="syslogPort"
+                                               placeholder="" value="{{ host_configuration.syslogPort }}"
+                                               name="syslogPort">
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+                            <div class="ibox-footer">
+                                <div class="form-group">
+                                    <button class="btn btn-primary pull-right btn-lg" type="submit">
+                                        <i class="fa fa-floppy-o"></i> &nbsp;Save configuration
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>Network activity in the last 24h</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <div class="row">
+                                <div class="col-xs-4">
+                                    <small class="stats-label">Blocked IPs</small>
+                                    <h4>{{ network_data.blocked_ips }}</h4>
+                                </div>
+
+                                <div class="col-xs-4">
+                                    <small class="stats-label">Blocked domains</small>
+                                    <h4>{{ network_data.blocked_domains }}</h4>
+                                </div>
+                                <div class="col-xs-4">
+                                    <small class="stats-label">Blocked files</small>
+                                    <h4>{{ network_data.blocked_files }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ibox-content text-right">
+                            <a class="btn btn-primary" href="search-in-logs">
+                                <i class="fa fa-search"></i>
+                                &nbsp;Search in logs
+                            </a>
+                        </div>
+                    </div>
+
+                    {% if host_configuration.live %}
+                    <div class="ibox float-e-margins" id="installation-widget">
+                        <div class="ibox-title">
+                            <h5>Install on host</h5>
+                        </div>
+                        <div class="ibox-content">
+                                    <p>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sit amet neque erat. Curabitur fermentum scelerisque diam. Donec erat purus, dictum a nibh eu, scelerisque ornare ipsum.</p>
+
+                        </div>
+                        <div class="ibox-content" id="install-spinner">
+                            <div class="sk-spinner sk-spinner-wave">
+                                <div class="sk-rect1"></div>
+                                <div class="sk-rect2"></div>
+                                <div class="sk-rect3"></div>
+                                <div class="sk-rect4"></div>
+                                <div class="sk-rect5"></div>
+                            </div>
+                        </div>
+                        <div class="ibox-content text-right" id="install-btn-container">
+                            <button id="installBtn" class="btn btn-primary">
+                                <i class="fa fa-download"></i> &nbsp;Install
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    {{ super() }}
+    <script>
+        $(document).ready(function () {
+            var eth0_dhcp = $('#eth0_dhcp');
+            var eth1_has_addr = $('#eth1_has_addr');
+            var renew_eth0_dhcp = $('#renew_eth0_dhcp');
+
+            // handle eth0 dhcp switch on/off
+            eth0_dhcp.change(function (event) {
+                if (eth0_dhcp.prop('checked')) {
+                    $('input[type=number][name*=eth0], input[type=number][name*=dns]').prop('disabled', true);
+                    renew_eth0_dhcp.prop('disabled', false);
+                } else {
+                    $('input[type=number][name*=eth0]').prop('disabled', false);
+                    renew_eth0_dhcp.prop('disabled', true);
+                }
+            });
+
+            eth1_has_addr.change(function () {
+                if (eth1_has_addr.prop('checked'))
+                    $('input[type=number][name*=eth1]').prop('disabled', false);
+                else
+                    $('input[type=number][name*=eth1]').prop('disabled', true);
+            });
+
+            $('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green',
+                radioClass: 'iradio_square-green'
+            });
+
+
+            $('#removeCertificate').click(function () {
+                $('#certBlock').show();
+                $('#noCertBlock').hide();
+            });
+
+            function renewDhcpLease(int) {
+                return function (event) {
+                    event.preventDefault();
+                    $.get('/renew-dhcp?interface=' + int)
+                            .success(function (a) {
+                                toastr['success']('DHCP renewed successfully.');
+                            })
+                            .error(function (err) {
+                                sweetAlert(
+                                        'Oops...',
+                                        'An error occurred during the renew - ' + err,
+                                        'error'
+                                );
+                            });
+                }
+            }
+
+            renew_eth0_dhcp.click(renewDhcpLease('eth0'));
+
+
+            var checkInstallStatusTimer = null;
+            var checkInterval = 5000; //ms
+            var installWidget = $('#installation-widget');
+
+            $('#installBtn').click(function() {
+
+                installWidget.addClass('installing');
+
+                $.ajax({
+                    method: 'POST',
+                    url: '/install',
+                    success: function() {
+                        toastr['success']('Installation started, wait on this page for more informations.');
+
+                        checkInstallStatusTimer = setInterval(function() {
+                            $.ajax({
+                                url: 'install',
+                                success: function(msg) {
+                                    if (msg === 'success') {
+                                        clearInterval(checkInstallStatusTimer);
+                                        installWidget
+                                                .removeClass('installing')
+                                                .addClass('installed');
+                                        sweetAlert(
+                                            'Installation Completed!',
+                                            'Installation completed successfully',
+                                            'success'
+                                        );
+                                    } else if (msg === 'error') {
+                                        clearInterval(checkInstallStatusTimer);
+                                        installWidget
+                                                .removeClass('installing');
+                                        sweetAlert(
+                                            'Installation Failed',
+                                            'An error occurred during the installation - please check that the host had an hard drive and a connection',
+                                            'error'
+                                        );
+                                    }
+                                }
+                            })
+                        }, checkInterval);
+                    },
+                    error: function(err) {
+                        console.log(err);
+                        sweetAlert(
+                            'Installation Failed',
+                            'An error occurred during the comunication with the server',
+                            'error'
+                        );
+                    }
+                });
+            });
+
+        });
+    </script>
+{% endblock %}
