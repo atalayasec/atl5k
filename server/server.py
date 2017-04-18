@@ -193,6 +193,7 @@ def save_configuration():
             'proxyEnabled': 'proxyOnOff' in request.form and request.form['proxyOnOff'] == 'on',
             'HTTPSEnabled': 'proxyHTTPS' in request.form and request.form['proxyHTTPS'] == 'on',
             'virustotal_api_key': request.form['virustotal_api_key'],
+            'safebrowsing_api_key': request.form['safebrowsing_api_key'],
             'sandbox_username': request.form['sandbox_username'],
             'sandbox_password': request.form['sandbox_password'],
             'proxyPort': request.form['proxyPort'] if request.form['proxyPort'] else 3128,

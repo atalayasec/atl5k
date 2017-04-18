@@ -117,6 +117,46 @@ def upload_file(file_name, body):
     r.msg = "do not trust this result"
     return r
 
+def safebrowsing_check_url(url):
+    apikey = live_config.get("safebrowsing_api_key")
+    if not apikey:
+        return "unknown"
+    request_url = "https://safebrowsing.googleapis.com/v4/threatMatches:find?key={}".format(apikey)
+    request_data = {
+        "client": {
+            "clientId": "thesecuritystack",
+            "clientVersion": "1.0"
+        },
+        "threatInfo": {
+            "threatTypes": [
+                "MALWARE",
+                "SOCIAL_ENGINEERING",
+                "UNWANTED_SOFTWARE",
+                "POTENTIALLY_HARMFUL_APPLICATION"
+            ],
+            "platformTypes": [
+                 "ANY_PLATFORM"
+            ],
+            "threatEntryTypes": [
+                "URL"
+            ],
+            "threatEntries": url
+        }
+    }
+    result = requests.post(
+        request_url,
+        headers={"Content-Type": "application/json"},
+        json=request_data
+    )
+    if result.status_code != requests.codes.ok:
+        return "unknown"
+    try:
+        json_data = result.get_json()
+        if len(json_data.get("matches", [])) > 0:
+            return "suspicious"
+        return "clean"
+    except ValueError:
+        return "unknown"
 
 def domain_cache(domain,logger,cache,memory_cache):
     whitelist = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=3)

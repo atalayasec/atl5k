@@ -22,10 +22,7 @@ def reload_host_configuration(new_config):
     live_config.set('upload_file_if_unknown', new_config['suricata_upload_mode'])
     live_config.set('iptables_forward_enabled', new_config['iptables_forward_enabled'])
     live_config.set('virustotal_api_key', new_config['virustotal_api_key'])
-    #live_config.set('syslogEnabled', new_config.get("syslogEnabled", False))
-    #if new_config.get("syslogEnabled", False):
-    #    live_config.set('syslogHost', new_config["syslogHost"])
-    #    live_config.set('syslogPort', new_config["syslogPort"])
+    live_config.set('safebrowsing_api_key', new_config['safebrowsing_api_key'])
 
     configs = {
         'new': new_config,
@@ -52,6 +49,7 @@ def get_host_configuration():
     conf = {}
 
     conf['virustotal_api_key'] = live_config.get('virustotal_api_key')
+    conf['safebrowsing_api_key'] = live_config.get('safebrowsing_api_key')
     conf['sandbox_username'] = live_config.get('sandbox_username')
     conf['sandbox_password'] = live_config.get('sandbox_password')
     conf['syslogEnabled'] = live_config.get("syslogEnabled") not in [None, "False"]
