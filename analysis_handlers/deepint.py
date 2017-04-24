@@ -59,20 +59,7 @@ def getIP(fqdn):
 
 
 def checkIP(ip):
-    r = requests.get(INSPECTOR_CACHED+"/vt/url/{}".format(ip))
-    try:
-        data = r.json()
-    except Exception as e:
-        print("exception {}: ###{}###".format(e, r.text))
-        data = {}
-    result = data.get("result")
-    if isinstance(result, dict):
-        score = result.get("score")
-        if score < 1.0:
-            return 'clean'
-        else:
-            return 'suspicious'
-    return 'unknown'
+    return safebrowsing_check_url(ip)
 
 def checkDomain(domain):
     return checkIP(domain)
@@ -148,15 +135,18 @@ def safebrowsing_check_url(url):
         headers={"Content-Type": "application/json"},
         json=request_data
     )
+    ret = ""
     if result.status_code != requests.codes.ok:
-        return "unknown"
+        ret = "unknown"
     try:
         json_data = result.get_json()
         if len(json_data.get("matches", [])) > 0:
-            return "suspicious"
-        return "clean"
+            ret = "suspicious"
+        ret = "clean"
     except ValueError:
-        return "unknown"
+        ret = "unknown"
+    print("safebrowsing result: {}".format(ret))
+    return ret
 
 def domain_cache(domain,logger,cache,memory_cache):
     whitelist = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=3)
