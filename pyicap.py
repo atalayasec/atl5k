@@ -295,7 +295,7 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
                 try:
                     enc_header_str += k + ': ' + v + '\r\n'
                 except Exception:
-                    print "enc_header_str Error for " + k
+                    print "enc_header_str Error for {}".format(k)
         if enc_header_str != '':
             enc_header_str += '\r\n'
 
@@ -342,7 +342,7 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
 
         words = requestline.split()
         if len(words) != 3:
-            raise ICAPError(400, "Bad request syntax (%r)" % requestline)
+            raise ICAPError(400, "Bad request syntax ({})".format(requestline))
 
         command, request_uri, version = words
 
@@ -350,7 +350,7 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
             raise ICAPError(400, "Bad request protocol, only accepting ICAP")
 
         if command not in ['OPTIONS', 'REQMOD', 'RESPMOD']:
-            raise ICAPError(501, "command %r is not implemented" % command)
+            raise ICAPError(501, "command {} is not implemented".format(command))
 
         try:
             base_version_number = version.split('/', 1)[1]
@@ -365,10 +365,10 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
                 raise ValueError
             version_number = int(version_number[0]), int(version_number[1])
         except (ValueError, IndexError):
-            raise ICAPError(400, "Bad request version (%r)" % version)
+            raise ICAPError(400, "Bad request version ({})".format(version))
 
         if version_number != (1, 0):
-            raise ICAPError(505, "Invalid ICAP Version (%s)" % base_version_number)
+            raise ICAPError(505, "Invalid ICAP Version ({})".format(base_version_number))
 
         self.command, self.request_uri, self.request_version = command, request_uri, version
 
@@ -472,7 +472,7 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
             self.wfile.flush()
             self.log_request(self.icap_response_code)
         except socket.timeout as e:
-            self.log_error("Request timed out: %r", e)
+            self.log_error("Request timed out: {}".format(e))
             self.close_connection = 1
         except ICAPError as e:
             self.send_error(e.code, e.message)
@@ -500,7 +500,7 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         if message is None:
             message = short
         explain = long
-        self.log_error("code %d, message %s", code, message)
+        self.log_error("code {}, message {}".format(code, message))
 
         # No encapsulation
         self.enc_req = None
@@ -534,7 +534,7 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         self.enc_req = None
 
         self.set_icap_response(200)  # TODO: message
-        self.set_enc_status('HTTP/1.1 %s %s' % (str(code), message))
+        self.set_enc_status('HTTP/1.1 {} {}'.format(str(code), message))
         self.set_enc_header('Content-Type', contenttype)
         self.set_enc_header('Content-Length', str(len(body)))
         self.send_headers(has_body=True)
@@ -548,8 +548,7 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         This is called by send_response().
         """
 
-        self.log_message('"%s" %s %s',
-                         self.requestline, str(code), str(size))
+        self.log_message('"{}" {} {}'.format(self.requestline, str(code), str(size)))
 
     def log_error(self, format, *args):
         """Log an error.
@@ -580,10 +579,7 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         message.
         """
 
-        sys.stderr.write("%s - - [%s] %s\n" %
-                         (self.client_address[0],
-                          self.log_date_time_string(),
-                          format % args))
+        sys.stderr.write("{} - - [{}] {}\n".format(self.client_address[0], self.log_date_time_string(), format.format(args)))
 
     def version_string(self):
         """Return the server software version string."""
