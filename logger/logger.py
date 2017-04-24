@@ -18,6 +18,8 @@ class DVLogger:
         self.remote_syslog = None
 
     def enable_syslog(self, host, port):
+        if not host or not port:
+            return
         logger = logging.getLogger("{}:{}".format(host, port))
         h = SysLogHandler(address=(str(host), int(port)))
         h.setLevel(logging.DEBUG)
