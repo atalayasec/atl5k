@@ -10,6 +10,8 @@ from config import get_config
 from logger.search import *
 from util.flask import *
 
+CENSORED = "*****"
+
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
 
@@ -119,10 +121,12 @@ def render_admin():
 
     host_cfg = get_host_configuration()
     if "cuckoo" in configured_analysers:
-        host_cfg['sandbox_username'] = "*****"
-        host_cfg['sandbox_password'] = "*****"
+        host_cfg['sandbox_username'] = CENSORED
+        host_cfg['sandbox_password'] = CENSORED
     if "virustotal" in configured_analysers:
-        host_cfg['virustotal_api_key'] = "**********"
+        host_cfg['virustotal_api_key'] = CENSORED
+    if host_cfg.get("safebrowsing_api_key"):
+        host_cfg["safebrowsing_api_key"] = CENSORED
 
     return render_template('admin/main.html',
                            host_configuration=host_cfg,
