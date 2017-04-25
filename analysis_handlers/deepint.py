@@ -139,7 +139,7 @@ def safebrowsing_check_url(url):
     if result.status_code != requests.codes.ok:
         ret = "unknown"
     try:
-        json_data = result.get_json()
+        json_data = result.json()
         if len(json_data.get("matches", [])) > 0:
             ret = "suspicious"
         ret = "clean"
