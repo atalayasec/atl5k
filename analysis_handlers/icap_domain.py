@@ -24,7 +24,7 @@ def check_domain_quality(url, memory_cache, logger, cache, pass_mode, icap_respo
         else:
             quality = cache.get(domain)
         if not quality:
-            quality = deepint.checkDomain(domain)
+            quality = deepint.checkDomain(url)
             cache.setex(domain, config['local_cache_expiration_seconds'], quality)
             memory_cache[domain] = quality
 
