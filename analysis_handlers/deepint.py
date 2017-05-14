@@ -127,7 +127,9 @@ def safebrowsing_check_url(url):
             "threatEntryTypes": [
                 "URL"
             ],
-            "threatEntries": url
+            "threatEntries": {
+                "url": url
+            }
         }
     }
     result = requests.post(
