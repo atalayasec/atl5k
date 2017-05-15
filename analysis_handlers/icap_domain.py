@@ -29,9 +29,9 @@ def check_domain_quality(url, memory_cache, logger, cache, pass_mode, icap_respo
 
     if quality == 'suspicious':
         if pass_mode:
-            logger.info('Domain {0} is malicious, pass'.format(url))
+            logger.info('Url {0} is malicious, pass'.format(url))
         else:
-            logger.info('Domain {0} is malicious, block'.format(url))
+            logger.info('Url {0} is malicious, block'.format(url))
             icap_response.set_icap_response(200)
             icap_response.set_enc_status('HTTP/1.1 307 Temporary Redirect')
             icap_response.set_enc_header('location', get_host() + '/malicious-domain?domain=' +
