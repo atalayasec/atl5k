@@ -137,16 +137,15 @@ def safebrowsing_check_url(url):
         headers={"Content-Type": "application/json"},
         json=request_data
     )
-    ret = ""
-    if result.status_code != requests.codes.ok:
-        ret = "unknown"
+    ret = "unknown"
     try:
         json_data = result.json()
         if len(json_data.get("matches", [])) > 0:
             ret = "suspicious"
-        ret = "clean"
+        else:
+            ret = "clean"
     except ValueError:
-        ret = "unknown"
+        pass
     print("safebrowsing result: {}".format(ret))
     return ret
 
