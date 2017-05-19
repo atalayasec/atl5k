@@ -4,6 +4,8 @@ from threading import Thread
 import redis
 from flask import Flask, render_template, flash, request, session, redirect
 import requests
+from flask_apscheduler import APScheduler
+from phishtank import PhishTank
 
 from authentication import check_credentials, login_required, change_password
 from config import get_config
@@ -30,6 +32,40 @@ app.config["PROPAGATE_EXCEPTIONS"] = True
 white_ip = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=2)
 white_domain = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=3)
 ALLOWED_EXTENSIONS = {'crt', 'cer', 'csr'}
+
+class APSchedulerConfig(object):
+    SCHEDULER_EXECUTORS = {
+        'default': {
+            'type': 'threadpool',
+            'max_workers': 1
+        }
+    }
+
+    SCHEDULER_JOB_DEFAULTS = {
+        "coalesce": False,
+        'max_instances': 1
+    }
+    SCHEDULER_API_ENABLED = True
+
+def phishtank_updater():
+    try:
+        cache = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=4)
+        urlcount = PhishTank.run(cache)
+        return "operation completed. discovered {} urls".format(urlcount)
+    except Exception as e:
+        return "operation failed. error: {}".format(e)
+
+app.config.from_object(APSchedulerConfig())
+app.add_url_rule("/pt/update", "force_update_phishtank", phishtank_updater, methods=['POST'])
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
+scheduler.add_job(
+    "phishtank_updater",
+    phishtank_updater,
+    trigger="interval",
+    seconds=86400
+)
 
 
 def allowed_file(filename):
@@ -332,6 +368,7 @@ def install():
             return 'ok', 200
         except Exception as e:
             return str(e), 500
+
 
 
 if __name__ == "__main__":
