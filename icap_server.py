@@ -80,6 +80,7 @@ class ICAPHandler(BaseICAPRequestHandler):
         )
 
         if block:
+            my_logger.info("ip {} blocked".format(url))
             my_logger.close()
             return
 
@@ -94,6 +95,7 @@ class ICAPHandler(BaseICAPRequestHandler):
         )
 
         if block:
+            my_logger.info("domain {} blocked".format(url))
             my_logger.close()
             return
 
@@ -105,6 +107,7 @@ class ICAPHandler(BaseICAPRequestHandler):
                 cache=cache,
                 pass_mode=pass_mode
             )
+            my_logger.info("file blocked")
             my_logger.close()
             return
 
