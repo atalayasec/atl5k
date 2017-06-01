@@ -115,39 +115,10 @@ class ICAPHandler(BaseICAPRequestHandler):
         self.no_adaptation_required()
 
 
-# ---------------------------------------------------------------------------------------------------------------------#
-# init sequence
-
-
-# writing pid into a file
-# pid = str(os.getpid())
-# f = open('/tmp/atl5k.pid', 'w+')
-# f.write(pid)
-# f.close()
-
-
-# def load_whitelist():
-#     # loading initial data from whitelist csv
-#     try:
-#         white_domain = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=3)
-#         trusted_domains = open(config['whitelist_csv'], 'r')
-#         r = csv.reader(trusted_domains, delimiter=',')
-#         print('Loading whitelist into redis\n')
-#         for row in r:
-#             white_domain.set(row[1], True)
-#
-#         trusted_domains.close()
-#     except IOError as e:
-#         # whitelist csv not found, just pass
-#         print('No whitelist CSV found\n')
-
 print('Starting ICAP daemon on port {0}\n'.format(port))
 server = ThreadingSimpleServer(('', port), ICAPHandler)
 
-# thread = threading.Thread(target=load_whitelist)
-
 try:
-    # thread.run()
     while True:
         server.handle_request()
 except KeyboardInterrupt:

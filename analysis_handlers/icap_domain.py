@@ -10,12 +10,6 @@ whitelist = redis.StrictRedis(host=config['redis_host'], port=config['redis_port
 
 def check_domain_quality(url, memory_cache, logger, cache, pass_mode, icap_response):
 
-    #domain = deepint.getFQDN(url)
-
-    # checking for domain in whitelist
-    #is_whitelisted = whitelist.get(domain)
-    #if is_whitelisted:
-    #    pass
     # handle in memory cache
     if url in memory_cache:
         quality = memory_cache.get(url)

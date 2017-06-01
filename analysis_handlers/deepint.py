@@ -39,7 +39,6 @@ def checkMD5(sample_md5):
         else:
             return 'malicious'
 
-#TODO make syslog configurable from web interface
 def syslog(message, level=6, facility=1, host='CONFIGURABLE LOG SERVER', port='CONFIGURABLE PORT'):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     now = datetime.datetime.now()
@@ -96,9 +95,6 @@ def writePayload(payload, file_extension):
 
 
 def upload_file(file_name, body):
-    #sbx = sandbox.Sandbox()
-    #return sbx.upload_sample(path=files_container + file_name,
-    #                         api_key=get_api_key())
     r = Result()
     r.status = "FAKE_SUCCESS"
     r.msg = "do not trust this result"

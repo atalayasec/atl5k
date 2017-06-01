@@ -6,9 +6,6 @@ config = get_config()
 
 
 def handle(domain, logger, cache,memory_cache):
-    #we expect a clean domain here, but just in case we are given for a URL we extract the domain
-    
-    
     logger.info('SDH Checking domain {0}'.format(domain))
 
     quality=deepint.domain_cache(domain,logger,cache,memory_cache)
@@ -16,7 +13,7 @@ def handle(domain, logger, cache,memory_cache):
 
     if not quality:
         quality = deepint.checkDomain(domain)
-        from_cache = False 
+        from_cache = False
 
     from_cache_message = ', from cache' if from_cache else ''
 

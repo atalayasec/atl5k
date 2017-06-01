@@ -13,9 +13,7 @@ live_config = redis.StrictRedis(host=config['redis_host'], port=config['redis_po
 cache = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=4)
 
 FILES_DIR = os.environ.get("SURICATA_WATCHER_FILES_DIR", "/var/log/suricata/files")
-# FILES_DIR = os.environ.get("SURICATA_WATCHER_FILES_DIR", "/home/duma/Documenti")
 LOG_DNS = "/var/log/suricata/dns.log"
-# LOG_DNS = "/home/duma/test.log"
 LOG_HTTP = "/var/log/suricata/http.log"
 PIDFILE="/var/run/surifiles.pid"
 
@@ -70,6 +68,5 @@ http_process.daemon = True
 
 
 # starting all loops
-#http_process.start()
 domain_process.start()
 notifier.loop()
