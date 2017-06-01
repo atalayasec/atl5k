@@ -52,6 +52,22 @@
                                                value="{{ host_configuration.sandbox_password }}">
                                     </div>
                                 </div>
+                                <h2>Phishtank Configuration</h2>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Phishtank API Key</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="phishtank_api_key"
+                                               value="{{ host_configuration.phishtank_api_key }}">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Phishtank Update Period (seconds, 0 or negative values disables, minimum 3600)</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="phishtank_update_delay"
+                                               value="{{ host_configuration.phishtank_update_delay }}">
+                                    </div>
+                                </div>
+
                                 <h2>Network interfaces</h2>
 
 

@@ -32,6 +32,10 @@ white_ip = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'
 white_domain = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=3)
 ALLOWED_EXTENSIONS = {'crt', 'cer', 'csr'}
 
+phishtank = PhishTank(redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=4), live_config)
+phishtank.daemon=True
+phishtank.start()
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -127,6 +131,9 @@ def render_admin():
         host_cfg['virustotal_api_key'] = CENSORED
     if host_cfg.get("safebrowsing_api_key"):
         host_cfg["safebrowsing_api_key"] = CENSORED
+    if host_cfg.get("phishtank_api_key"):
+        host_cfg["phishtank_api_key"] = CENSORED
+
 
     return render_template('admin/main.html',
                            host_configuration=host_cfg,
@@ -200,6 +207,8 @@ def save_configuration():
             'safebrowsing_api_key': request.form['safebrowsing_api_key'],
             'sandbox_username': request.form['sandbox_username'],
             'sandbox_password': request.form['sandbox_password'],
+            'phishtank_api_key': request.form['phishtank_api_key'],
+            'phishtank_update_delay': request.form['phishtank_update_delay'],
             'proxyPort': request.form['proxyPort'] if request.form['proxyPort'] else 3128,
             'proxyMode': request.form['proxyMode']
         }
@@ -239,6 +248,16 @@ def save_configuration():
             live_config["syslogHost"] = syslogHost
         else:
             live_config["syslogEnabled"] = False
+
+
+        live_config["phishtank_api_key"] = request.form.get("phishtank_api_key", None)
+        live_config["phishtank_update_delay"] = request.form.get("phishtank_update_delay", -1)
+        root.info("configured phishtank with api {}... delay {}".format(
+            request.form.get("phishtank_api_key")[:5],
+            request.form.get("phishtank_update_delay")
+        ))
+
+
 
 
         # handling HTTPS certificate case
