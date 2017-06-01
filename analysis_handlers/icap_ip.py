@@ -16,14 +16,17 @@ def check_ip_quality(url, memory_cache, logger, cache, pass_mode, icap_response)
     # checking for ip in whitelist
     is_whitelisted = whitelist.get(ip)
     if not is_whitelisted:
+        logger.info("NOT whitelisted {}".format(ip))
         # handle memory cache
         if ip in memory_cache:
             quality = memory_cache.get(ip)
         # in memory cache not found, check redis
         else:
+            logger.info("MISS from in-memory cache {}".format(ip))
             # handling local cache
             quality = cache.get(ip)
         if not quality:
+            logger.info("MISS from cache {}".format(ip))
             quality = deepint.checkIP(ip)
             cache.setex(ip, config['local_cache_expiration_seconds'], quality)
             memory_cache[ip] = quality

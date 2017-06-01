@@ -21,8 +21,10 @@ def check_domain_quality(url, memory_cache, logger, cache, pass_mode, icap_respo
         quality = memory_cache.get(url)
     # in memory_cache not found, check redis cache
     else:
+        logger.info("MISS from in-memory cache {}".format(url))
         quality = cache.get(url)
     if not quality:
+        logger.info("MISS from cache")
         quality = deepint.checkDomain(url)
         cache.setex(url, config['local_cache_expiration_seconds'], quality)
         memory_cache[url] = quality
