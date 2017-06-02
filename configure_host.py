@@ -24,7 +24,8 @@ class DictDiffer(object):
 
     def __init__(self, current_dict, past_dict):
         self.current_dict, self.past_dict = current_dict, past_dict
-        self.set_current, self.set_past = set(current_dict.keys()), set(past_dict.keys())
+        self.set_current, self.set_past = set(current_dict.keys()), set(
+            past_dict.keys())
         self.intersect = self.set_current.intersection(self.set_past)
 
     def added(self):
@@ -34,10 +35,12 @@ class DictDiffer(object):
         return self.set_past - self.intersect
 
     def changed(self):
-        return set(o for o in self.intersect if self.past_dict[o] != self.current_dict[o])
+        return set(o for o in self.intersect
+                   if self.past_dict[o] != self.current_dict[o])
 
     def unchanged(self):
-        return set(o for o in self.intersect if self.past_dict[o] == self.current_dict[o])
+        return set(o for o in self.intersect
+                   if self.past_dict[o] == self.current_dict[o])
 
 
 def restart_squid():
@@ -112,19 +115,25 @@ def reload_complete_configuration(old_config, new_config):
             subprocess.call(['/bin/systemctl', 'stop', 'suricata'])
     squid_already_enabled = False
 
-
-
     # iptables handling
     if 'iptables_forward_enabled' in changes:
         if new_config['iptables_forward_enabled']:
-            subprocess.call(['/sbin/iptables', '-t', 'nat', '-A', 'POSTROUTING', '-o', 'eth0', '-j', 'MASQUERADE'])
-            subprocess.call(['/sbin/iptables', '-A', 'FORWARD', '-i', 'eth0', '-o', 'eth1', '-m', 'state', '--state',
-                             'NEW,RELATED,ESTABLISHED', '-j', 'ACCEPT'])
-            subprocess.call(['/sbin/iptables', '-A', 'FORWARD', '-i', 'eth1', '-o', 'eth0', '-j', 'ACCEPT'])
+            subprocess.call([
+                '/sbin/iptables', '-t', 'nat', '-A', 'POSTROUTING', '-o',
+                'eth0', '-j', 'MASQUERADE'
+            ])
+            subprocess.call([
+                '/sbin/iptables', '-A', 'FORWARD', '-i', 'eth0', '-o', 'eth1',
+                '-m', 'state', '--state', 'NEW,RELATED,ESTABLISHED', '-j',
+                'ACCEPT'
+            ])
+            subprocess.call([
+                '/sbin/iptables', '-A', 'FORWARD', '-i', 'eth1', '-o', 'eth0',
+                '-j', 'ACCEPT'
+            ])
         else:
             subprocess.call(['/sbin/iptables', '-t', 'nat', '-F'])
             subprocess.call(['/sbin/iptables', '-F'])
-
 
     # squid handling
     if 'proxyPort' in changes or 'HTTPSEnabled' in changes or 'HTTPSCertificate' in changes:

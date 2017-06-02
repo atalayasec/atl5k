@@ -5,10 +5,12 @@ from config import get_config
 from util.flask import get_host
 
 config = get_config()
-whitelist = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=3)
+whitelist = redis.StrictRedis(
+    host=config['redis_host'], port=config['redis_port'], db=3)
 
 
-def check_domain_quality(url, memory_cache, logger, cache, pass_mode, icap_response):
+def check_domain_quality(url, memory_cache, logger, cache, pass_mode,
+                         icap_response):
 
     # handle in memory cache
     if url in memory_cache:
@@ -30,8 +32,9 @@ def check_domain_quality(url, memory_cache, logger, cache, pass_mode, icap_respo
             logger.info('Url {0} is malicious, block'.format(url))
             icap_response.set_icap_response(200)
             icap_response.set_enc_status('HTTP/1.1 307 Temporary Redirect')
-            icap_response.set_enc_header('location', get_host() + '/malicious-domain?domain=' +
-                                         deepint.getFQDN(url) + '&url=' + url)
+            icap_response.set_enc_header(
+                'location',
+                get_host() + '/malicious-domain?domain=' + deepint.getFQDN(url) + '&url=' + url)
             icap_response.send_headers(False)
             return True
 

@@ -33,8 +33,9 @@ white_domain = redis.StrictRedis(host=config['redis_host'], port=config['redis_p
 ALLOWED_EXTENSIONS = {'crt', 'cer', 'csr'}
 
 phishtank = PhishTank(redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=4), live_config)
-phishtank.daemon=True
+phishtank.daemon = True
 phishtank.start()
+
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -82,7 +83,6 @@ def whitelist_domain():
 @app.route("/check")
 def check():
     md5 = request.args.get('md5')
-
 
     class R(object):
         status = "SANDBOX_STATUS_FAKE"
@@ -133,7 +133,6 @@ def render_admin():
         host_cfg["safebrowsing_api_key"] = CENSORED
     if host_cfg.get("phishtank_api_key"):
         host_cfg["phishtank_api_key"] = CENSORED
-
 
     return render_template('admin/main.html',
                            host_configuration=host_cfg,
@@ -231,12 +230,10 @@ def save_configuration():
             new_config['eth1_gateway'] = request.form['eth1_gw_1'] + '.' + request.form['eth1_gw_2'] + \
                                          '.' + request.form['eth1_gw_3'] + '.' + request.form['eth1_gw_4']
 
-
         new_config['dns1'] = request.form.get('dns1-1', "") + '.' + request.form.get('dns1-2', "") + \
                              '.' + request.form.get('dns1-3', "") + '.' + request.form.get('dns1-4', "")
         new_config['dns2'] = request.form.get('dns2-1', "") + '.' + request.form.get('dns2-2', "") + \
                              '.' + request.form.get('dns2-3', "") + '.' + request.form.get('dns2-4', "")
-
 
         syslogEnabled = request.form.get("syslogEnabled")
         syslogHost = request.form.get("syslogHost", None)
@@ -249,16 +246,12 @@ def save_configuration():
         else:
             live_config["syslogEnabled"] = False
 
-
         live_config["phishtank_api_key"] = request.form.get("phishtank_api_key", None)
         live_config["phishtank_update_delay"] = request.form.get("phishtank_update_delay", -1)
         root.info("configured phishtank with api {}... delay {}".format(
             request.form.get("phishtank_api_key")[:5],
             request.form.get("phishtank_update_delay")
         ))
-
-
-
 
         # handling HTTPS certificate case
         if 'HTTPSCertificate' in request.files:
@@ -351,8 +344,6 @@ def install():
             return 'ok', 200
         except Exception as e:
             return str(e), 500
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)

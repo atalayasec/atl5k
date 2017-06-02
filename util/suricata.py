@@ -26,8 +26,8 @@ def parse_http_log(filename, regex, domain_handler, ip_handler, cache, memory_ca
         m = r.match(line)
         if m:
             host = m.group("domain")
-            if  not r2.match(host):
-                if not host in local_filter:
+            if not r2.match(host):
+                if host not in local_filter:
                     domain_handler(host, logger, cache)
             else:
                 ip_handler(host, logger, cache)
@@ -42,7 +42,7 @@ def parse_dns_log(filename, regex, domain_handler, cache, memory_cache, logger):
         m = r.match(line)
         if m:
             domain = m.group("domain")
-            if not domain in local_filter:
+            if domain not in local_filter:
                 domain_handler(domain, logger, cache, memory_cache)
 
 

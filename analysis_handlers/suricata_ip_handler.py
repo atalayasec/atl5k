@@ -4,7 +4,7 @@ from config import get_config
 config = get_config()
 
 
-def handle(ip, logger, cache,memory_cache):
+def handle(ip, logger, cache, memory_cache):
 
     quality = cache.get(ip)
     from_cache = True

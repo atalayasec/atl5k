@@ -6,15 +6,16 @@ import time
 from named_logger import NamedLogger
 import multiprocessing
 
+
 class PhishTank(multiprocessing.Process, NamedLogger):
     __logname__ = "phishtank"
-    FILE_URL="http://data.phishtank.com/data/{}/online-valid.json.bz2"
+    FILE_URL = "http://data.phishtank.com/data/{}/online-valid.json.bz2"
 
     def __init__(self, cache, config):
         multiprocessing.Process.__init__(self)
         self.setup_logger()
-        self.cache=cache
-        self.config=config
+        self.cache = cache
+        self.config = config
 
     def run(self):
         while True:

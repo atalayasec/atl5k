@@ -1,35 +1,36 @@
 import deepint
 import re
 
+META_HOST = 'HTTP HOST: *(?P<domain>[a-zA-Z0-9\-\.\_]+)'
 
-META_HOST='HTTP HOST: *(?P<domain>[a-zA-Z0-9\-\.\_]+)'
 
 def parsefilemeta(path):
-    x=re.compile(META_HOST)
-    fd = open(path+'.meta', 'r')
+    x = re.compile(META_HOST)
+    fd = open(path + '.meta', 'r')
     for l in fd:
-        m=x.match(l)
+        m = x.match(l)
         if m:
             return m.group('domain')
     f.close()
 
 
+def handle(md5string, event, logger, cache, memory_cache, upload_mode=False):
+    domain = parsefilemeta(event.pathname)
 
-def handle(md5string, event, logger,cache,memory_cache, upload_mode=False):
-    domain=parsefilemeta(event.pathname)
-    
-    quality=deepint.domain_cache(domain,logger,cache,memory_cache)
-
+    quality = deepint.domain_cache(domain, logger, cache, memory_cache)
 
     if quality is not 'clean':
-        logger.info('Checking File {0} as domain {1} is not clean'.format(event.name,domain))
+        logger.info('Checking File {0} as domain {1} is not clean'.format(
+            event.name, domain))
         filecache = cache.get(md5)
         if filecache:
-            logger.info('File {0} quality information taken from local cache'.format(md5))
+            logger.info('File {0} quality information taken from local cache'.
+                        format(md5))
         else:
             quality = deepint.checkMD5(md5string)
             if quality != 'unknown':
-                cache.setex(md5, config['local_cache_expiration_seconds'], quality)
+                cache.setex(md5, config['local_cache_expiration_seconds'],
+                            quality)
     if quality == 'malicious':
         logger.info('File {0} is malicious'.format(event.name))
     elif quality == 'clean':

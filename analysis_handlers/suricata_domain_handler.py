@@ -5,10 +5,10 @@ from urlparse import urlparse
 config = get_config()
 
 
-def handle(domain, logger, cache,memory_cache):
+def handle(domain, logger, cache, memory_cache):
     logger.info('SDH Checking domain {0}'.format(domain))
 
-    quality=deepint.domain_cache(domain,logger,cache,memory_cache)
+    quality = deepint.domain_cache(domain, logger, cache, memory_cache)
     from_cache = True
 
     if not quality:
@@ -18,10 +18,12 @@ def handle(domain, logger, cache,memory_cache):
     from_cache_message = ', from cache' if from_cache else ''
 
     if quality == 'suspicious':
-        logger.info('SDH Domain {0} is suspicious{1}'.format(domain, from_cache_message))
+        logger.info('SDH Domain {0} is suspicious{1}'.format(
+            domain, from_cache_message))
 
     elif quality == 'clean':
-        logger.info('SDH Domain {0} is clean{1}'.format(domain, from_cache_message))
+        logger.info(
+            'SDH Domain {0} is clean{1}'.format(domain, from_cache_message))
 
     else:
         logger.info('SDH Domain {0} is unknown'.format(domain))

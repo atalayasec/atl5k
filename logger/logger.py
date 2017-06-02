@@ -33,8 +33,9 @@ class DVLogger:
 
     def info(self, body):
         cursor = self.conn.cursor()
-        cursor.execute("INSERT INTO events(moment, body, level) VALUES (%s, %s, %s)",
-                       [now(), body, 'INFO'])
+        cursor.execute(
+            "INSERT INTO events(moment, body, level) VALUES (%s, %s, %s)",
+            [now(), body, 'INFO'])
         self.conn.commit()
         cursor.close()
         if self.remote_syslog:
@@ -42,6 +43,3 @@ class DVLogger:
 
     def close(self):
         self.conn.close()
-
-
-

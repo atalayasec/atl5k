@@ -42,24 +42,27 @@ def check_file_quality(icap_response, logger, pass_mode, cache):
         if not quality:
             quality = deepint.checkMD5(md5)
             if quality != 'unknown':
-                cache.setex(md5, config['local_cache_expiration_seconds'], quality)
+                cache.setex(md5, config['local_cache_expiration_seconds'],
+                            quality)
 
         if quality == 'malicious':
-            if pass_mode == True:
+            if pass_mode:
                 logger.info('File {0} is malicious, pass'.format(md5))
             else:
                 logger.info('File {0} is malicious, block'.format(md5))
                 icap_response.set_icap_response(200)
                 icap_response.set_enc_status('HTTP/1.1 307 Temporary Redirect')
                 icap_response.set_enc_header('location',
-                                             proxy_url + malicious_file_url + '?md5=' + deepint.md5(body))
+                                             proxy_url + malicious_file_url +
+                                             '?md5=' + deepint.md5(body))
                 icap_response.send_headers(False)
                 return
 
         elif quality == 'clean':
             icap_response.set_icap_response(200)
             icap_response.set_enc_status('HTTP/1.1 307 Temporary Redirect')
-            test = proxy_url + '/static/tmp/' + deepint.writePayload(body, file_extension)
+            test = proxy_url + '/static/tmp/' + deepint.writePayload(
+                body, file_extension)
             icap_response.set_enc_header('location', test)
 
             icap_response.send_headers(False)
@@ -71,12 +74,13 @@ def check_file_quality(icap_response, logger, pass_mode, cache):
                 handle_file_upload(file_name, body)
 
             except Exception as e:
-                print('er- '+e)
+                print('er- ' + e)
 
             icap_response.set_icap_response(200)
             icap_response.set_enc_status('HTTP/1.1 307 Temporary Redirect')
-            icap_response.set_enc_header('location', proxy_url + quarantine_page_url +
-                                         '?md5=' + md5 + '&filename=' + file_name)
+            icap_response.set_enc_header(
+                'location', proxy_url + quarantine_page_url + '?md5=' + md5 +
+                '&filename=' + file_name)
             icap_response.send_headers(False)
 
             return True

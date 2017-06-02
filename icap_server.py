@@ -5,7 +5,7 @@ import signal
 import tempfile
 
 import redis
-import pylru # https://pypi.python.org/pypi/pylru
+import pylru  # https://pypi.python.org/pypi/pylru
 
 from config import get_config
 from analysis_handlers.icap_domain import check_domain_quality
@@ -19,24 +19,28 @@ parser = argparse.ArgumentParser(description='icap_server')
 parser.add_argument("--port", "-p", type=int, help="listen port")
 args = parser.parse_args()
 
-MEMORY_CACHE_SIZE=100000
+MEMORY_CACHE_SIZE = 100000
 
 config = get_config()
 port = int(args.port)
 
 # redis cache and whitelist
-interprocess_comunication = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=1)
-cache = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=4)
+interprocess_comunication = redis.StrictRedis(
+    host=config['redis_host'], port=config['redis_port'], db=1)
+cache = redis.StrictRedis(
+    host=config['redis_host'], port=config['redis_port'], db=4)
 
 memory_cache = pylru.lrucache(MEMORY_CACHE_SIZE)
+
 
 def pheFei5Kpmh32Ja6(sig, frame):
     pid = os.getpid()
     fd, path = tempfile.mkstemp(text=True, prefix="icap_cache_{}_".format(pid))
     with open(path, "w") as f:
-        for k,v in memory_cache.items():
+        for k, v in memory_cache.items():
             f.write("{}:  {}\n".format(k, v))
     os.close(fd)
+
 
 signal.signal(signal.SIGUSR2, pheFei5Kpmh32Ja6)
 
@@ -76,8 +80,7 @@ class ICAPHandler(BaseICAPRequestHandler):
             memory_cache=memory_cache,
             logger=my_logger,
             cache=cache,
-            pass_mode=pass_mode
-        )
+            pass_mode=pass_mode)
 
         if block:
             my_logger.info("ip {} blocked".format(url))
@@ -91,8 +94,7 @@ class ICAPHandler(BaseICAPRequestHandler):
             memory_cache=memory_cache,
             logger=my_logger,
             cache=cache,
-            pass_mode=pass_mode
-        )
+            pass_mode=pass_mode)
 
         if block:
             my_logger.info("domain {} blocked".format(url))
@@ -105,8 +107,7 @@ class ICAPHandler(BaseICAPRequestHandler):
                 icap_response=self,
                 logger=my_logger,
                 cache=cache,
-                pass_mode=pass_mode
-            )
+                pass_mode=pass_mode)
             my_logger.info("file blocked")
             my_logger.close()
             return

@@ -104,7 +104,6 @@ def get_host_configuration():
     except CalledProcessError:
         conf['proxyEnabled'] = False
 
-
     # TODO: refactor this porting all to redis and init.py
     try:
         host_file = open(local_path + '/../' + config['host_configuration_file'], 'r')
@@ -117,14 +116,8 @@ def get_host_configuration():
             except KeyError:
                 conf[key] = None
 
-
     except IOError:
         conf['HTTPSEnabled'] = conf['HTTPSCertificate'] = None
-
-    # -----
-
-
-
 
     try:
         conf['suricataEnabled'] = subprocess.check_output(['pidof', 'suricata']) != ''
@@ -147,7 +140,6 @@ def get_host_configuration():
     else:
         conf['dns2'] = None
 
-
     f = open('/proc/cmdline')
     tmp = f.read()
 
@@ -160,7 +152,7 @@ def get_host():
     try:
         eth0_info = ni.ifaddresses('eth0')
         return 'http://' + eth0_info[2][0]['addr']
-    except Exception as e:
+    except Exception:
         return 'http://localhost:5000'
 
 

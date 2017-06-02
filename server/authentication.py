@@ -45,4 +45,3 @@ def change_password(new_password):
     except Exception as e:
         print e
         return False
-

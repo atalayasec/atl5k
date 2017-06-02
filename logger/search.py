@@ -5,12 +5,7 @@ config = get_config()
 
 
 def list_to_dict(l):
-    return {
-        'id': l[0],
-        'moment': l[1],
-        'body': l[2],
-        'level': l[3]
-    }
+    return {'id': l[0], 'moment': l[1], 'body': l[2], 'level': l[3]}
 
 
 def rows_to_dict(rows):
@@ -61,7 +56,9 @@ def get_blocked_ips_24():
     db = get_connection()
     ms_24h = 24 * 3600 * 1000
     c = db.cursor()
-    c.execute('SELECT COUNT(*) FROM events WHERE body ~* \'^IP.*block$\' AND moment > %s;', [ms_24h])
+    c.execute(
+        'SELECT COUNT(*) FROM events WHERE body ~* \'^IP.*block$\' AND moment > %s;',
+        [ms_24h])
     res = c.fetchone()
     c.close()
     db.close()
@@ -72,7 +69,9 @@ def get_blocked_domains_24():
     db = get_connection()
     ms_24h = 24 * 3600 * 1000
     c = db.cursor()
-    c.execute('SELECT COUNT(*) FROM events WHERE body ~* \'^Domain.*block$\' AND moment > %s;', [ms_24h])
+    c.execute(
+        'SELECT COUNT(*) FROM events WHERE body ~* \'^Domain.*block$\' AND moment > %s;',
+        [ms_24h])
     res = c.fetchone()
     c.close()
     db.close()
@@ -83,7 +82,9 @@ def get_blocked_files_24():
     db = get_connection()
     ms_24h = 24 * 3600 * 1000
     c = db.cursor()
-    c.execute('SELECT COUNT(*) FROM events WHERE body ~* \'^File.*block$\' AND moment > %s;', [ms_24h])
+    c.execute(
+        'SELECT COUNT(*) FROM events WHERE body ~* \'^File.*block$\' AND moment > %s;',
+        [ms_24h])
     res = c.fetchone()
     c.close()
     db.close()

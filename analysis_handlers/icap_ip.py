@@ -5,10 +5,12 @@ from config import get_config
 from util.flask import get_host
 
 config = get_config()
-whitelist = redis.StrictRedis(host=config['redis_host'], port=config['redis_port'], db=2)
+whitelist = redis.StrictRedis(
+    host=config['redis_host'], port=config['redis_port'], db=2)
 
 
-def check_ip_quality(url, memory_cache, logger, cache, pass_mode, icap_response):
+def check_ip_quality(url, memory_cache, logger, cache, pass_mode,
+                     icap_response):
 
     fqdn = deepint.getFQDN(url)
     ip = deepint.getIP(fqdn)
@@ -38,7 +40,9 @@ def check_ip_quality(url, memory_cache, logger, cache, pass_mode, icap_response)
                 logger.info('IP {0} is malicious, block'.format(ip))
                 icap_response.set_icap_response(200)
                 icap_response.set_enc_status('HTTP/1.1 307 Temporary Redirect')
-                icap_response.set_enc_header('location', get_host() + '/malicious-ip?ip=' + ip + '&url=' + url)
+                icap_response.set_enc_header(
+                    'location',
+                    get_host() + '/malicious-ip?ip=' + ip + '&url=' + url)
                 icap_response.send_headers(False)
                 return True
 

@@ -20,7 +20,7 @@ class ICAPError(Exception):
     """Signals a protocol error"""
 
     def __init__(self, code=500, message=None):
-        if message == None:
+        if message is None:
             message = BaseICAPRequestHandler._responses[code]
 
         super(ICAPError, self).__init__(message)
@@ -53,43 +53,34 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         100: ('Continue', 'Request received, please continue'),
         101: ('Switching Protocols',
               'Switching to new protocol; obey Upgrade header'),
-
         200: ('OK', 'Request fulfilled, document follows'),
         201: ('Created', 'Document created, URL follows'),
-        202: ('Accepted',
-              'Request accepted, processing continues off-line'),
+        202: ('Accepted', 'Request accepted, processing continues off-line'),
         203: ('Non-Authoritative Information', 'Request fulfilled from cache'),
         204: ('No Content', 'Request fulfilled, nothing follows'),
         205: ('Reset Content', 'Clear input form for further input.'),
         206: ('Partial Content', 'Partial content follows.'),
-
         300: ('Multiple Choices',
               'Object has several resources -- see URI list'),
         301: ('Moved Permanently', 'Object moved permanently -- see URI list'),
         302: ('Found', 'Object moved temporarily -- see URI list'),
         303: ('See Other', 'Object moved -- see Method and URL list'),
-        304: ('Not Modified',
-              'Document has not changed since given time'),
+        304: ('Not Modified', 'Document has not changed since given time'),
         305: ('Use Proxy',
               'You must use proxy specified in Location to access this '
               'resource.'),
         307: ('Temporary Redirect',
               'Object moved temporarily -- see URI list'),
-
-        400: ('Bad Request',
-              'Bad request syntax or unsupported method'),
-        401: ('Unauthorized',
-              'No permission -- see authorization schemes'),
-        402: ('Payment Required',
-              'No payment -- see charging schemes'),
-        403: ('Forbidden',
-              'Request forbidden -- authorization will not help'),
+        400: ('Bad Request', 'Bad request syntax or unsupported method'),
+        401: ('Unauthorized', 'No permission -- see authorization schemes'),
+        402: ('Payment Required', 'No payment -- see charging schemes'),
+        403: ('Forbidden', 'Request forbidden -- authorization will not help'),
         404: ('Not Found', 'Nothing matches the given URI'),
         405: ('Method Not Allowed',
               'Specified method is invalid for this resource.'),
         406: ('Not Acceptable', 'URI not available in preferred format.'),
         407: ('Proxy Authentication Required', 'You must authenticate with '
-                                               'this proxy before proceeding.'),
+              'this proxy before proceeding.'),
         408: ('Request Timeout', 'Request timed out; try again later.'),
         409: ('Conflict', 'Request conflict.'),
         410: ('Gone',
@@ -103,17 +94,14 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
               'Cannot satisfy request range.'),
         417: ('Expectation Failed',
               'Expect condition could not be satisfied.'),
-
         500: ('Internal Server Error', 'Server got itself in trouble'),
-        501: ('Not Implemented',
-              'Server does not support this operation'),
+        501: ('Not Implemented', 'Server does not support this operation'),
         502: ('Bad Gateway', 'Invalid responses from another server/proxy.'),
         503: ('Service Unavailable',
               'The server cannot process the request due to a high load'),
         504: ('Gateway Timeout',
               'The gateway server did not receive a timely response'),
         505: ('Protocol Version Not Supported', 'Cannot fulfill request.'),
-
     }
 
     # The Python system version, truncated to its first component.
@@ -126,9 +114,10 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
 
     _weekdayname = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
-    _monthname = [None,
-                  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    _monthname = [
+        None, 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+        'Oct', 'Nov', 'Dec'
+    ]
 
     def _read_status(self):
         """Read a HTTP or ICAP status line from input stream"""
@@ -247,7 +236,8 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
 
     def set_icap_response(self, code):
         """Sets the ICAP response's status line and response code"""
-        self.icap_response = 'ICAP/1.0 ' + str(code) + ' ' + self._responses[code][0]
+        self.icap_response = 'ICAP/1.0 ' + str(
+            code) + ' ' + self._responses[code][0]
         self.icap_response_code = code
 
     def set_icap_header(self, header, value):
@@ -265,11 +255,11 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         """
         enc_header = None
         enc_req_stat = ''
-        if self.enc_request != None:
+        if self.enc_request is not None:
             enc_header = 'req-hdr=0'
             enc_body = 'req-body='
             enc_req_stat = self.enc_request + '\r\n'
-        elif self.enc_status != None:
+        elif self.enc_status is not None:
             enc_header = 'res-hdr=0'
             enc_body = 'res-body='
             enc_req_stat = self.enc_status + '\r\n'
@@ -277,16 +267,15 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         if not has_body:
             enc_body = 'null-body='
 
-        if not self.icap_headers.has_key('ISTag'):
-            self.set_icap_header('ISTag', ''.join(map(
-                lambda x: random.choice('ABCDIFGHIJabcdefghij1234567890'),
-                xrange(32)
-            )))
+        if 'ISTag' not in self.icap_headers:
+            self.set_icap_header('ISTag', ''.join(
+                map(lambda x: random.choice('ABCDIFGHIJabcdefghij1234567890'),
+                    xrange(32))))
 
-        if not self.icap_headers.has_key('Date'):
+        if 'Date' not in self.icap_headers:
             self.set_icap_header('Date', self.date_time_string())
 
-        if not self.icap_headers.has_key('Server'):
+        if 'Server' not in self.icap_headers:
             self.set_icap_header('Server', self.version_string())
 
         enc_header_str = enc_req_stat
@@ -316,10 +305,8 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
 
         icap_header_str += '\r\n'
 
-        self.wfile.write(
-            self.icap_response + '\r\n' +
-            icap_header_str + enc_header_str
-        )
+        self.wfile.write(self.icap_response + '\r\n' + icap_header_str +
+                         enc_header_str)
 
     def parse_request(self):
         """Parse a request (internal).
@@ -350,7 +337,8 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
             raise ICAPError(400, "Bad request protocol, only accepting ICAP")
 
         if command not in ['OPTIONS', 'REQMOD', 'RESPMOD']:
-            raise ICAPError(501, "command {} is not implemented".format(command))
+            raise ICAPError(501,
+                            "command {} is not implemented".format(command))
 
         try:
             base_version_number = version.split('/', 1)[1]
@@ -368,7 +356,8 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
             raise ICAPError(400, "Bad request version ({})".format(version))
 
         if version_number != (1, 0):
-            raise ICAPError(505, "Invalid ICAP Version ({})".format(base_version_number))
+            raise ICAPError(
+                505, "Invalid ICAP Version ({})".format(base_version_number))
 
         self.command, self.request_uri, self.request_version = command, request_uri, version
 
@@ -387,22 +376,23 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
                 self.encapsulated[k] = int(v)
 
         self.preview = self.headers.get('preview', [None])[0]
-        self.allow = map(lambda x: x.strip(), self.headers.get('allow', [''])[0].split(','))
+        self.allow = map(lambda x: x.strip(),
+                         self.headers.get('allow', [''])[0].split(','))
 
         if self.command == 'REQMOD':
-            if self.encapsulated.has_key('req-hdr'):
+            if 'req-hdr' in self.encapsulated:
                 self.enc_req = self._read_request()
                 self.enc_req_headers = self._read_headers()
-            if self.encapsulated.has_key('req-body'):
+            if 'req-body' in self.encapsulated:
                 self.has_body = True
         elif self.command == 'RESPMOD':
-            if self.encapsulated.has_key('req-hdr'):
+            if 'req-hdr' in self.encapsulated:
                 self.enc_req = self._read_request()
                 self.enc_req_headers = self._read_headers()
-            if self.encapsulated.has_key('res-hdr'):
+            if 'res-hdr' in self.encapsulated:
                 self.enc_res_status = self._read_status()
                 self.enc_res_headers = self._read_headers()
-            if self.encapsulated.has_key('res-body'):
+            if 'res-body' in self.encapsulated:
                 self.has_body = True
         # Else: OPTIONS. No encapsulation.
 
@@ -510,7 +500,11 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         self.set_icap_header('Connection', 'close')  # TODO: why?
         self.send_headers()
 
-    def send_enc_error(self, code, message=None, body='', contenttype='text/html'):
+    def send_enc_error(self,
+                       code,
+                       message=None,
+                       body='',
+                       contenttype='text/html'):
         """Send an encapsulated error reply.
 
         Arguments are the error code, and a detailed message.
@@ -548,7 +542,8 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         This is called by send_response().
         """
 
-        self.log_message('"{}" {} {}'.format(self.requestline, str(code), str(size)))
+        self.log_message(
+            '"{}" {} {}'.format(self.requestline, str(code), str(size)))
 
     def log_error(self, format, *args):
         """Log an error.
@@ -579,7 +574,8 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         message.
         """
 
-        sys.stderr.write("{} - - [{}] {}\n".format(self.client_address[0], self.log_date_time_string(), format.format(args)))
+        sys.stderr.write("{} - - [{}] {}\n".format(self.client_address[
+            0], self.log_date_time_string(), format.format(args)))
 
     def version_string(self):
         """Return the server software version string."""
@@ -590,18 +586,18 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         if timestamp is None:
             timestamp = time.time()
         year, month, day, hh, mm, ss, wd, y, z = time.gmtime(timestamp)
-        s = "%s, %02d %3s %4d %02d:%02d:%02d GMT" % (
-            self._weekdayname[wd],
-            day, self._monthname[month], year,
-            hh, mm, ss)
+        s = "%s, %02d %3s %4d %02d:%02d:%02d GMT" % (self._weekdayname[wd],
+                                                     day,
+                                                     self._monthname[month],
+                                                     year, hh, mm, ss)
         return s
 
     def log_date_time_string(self):
         """Return the current time formatted for logging."""
         now = time.time()
         year, month, day, hh, mm, ss, x, y, z = time.localtime(now)
-        s = "%02d/%3s/%04d %02d:%02d:%02d" % (
-            day, self._monthname[month], year, hh, mm, ss)
+        s = "%02d/%3s/%04d %02d:%02d:%02d" % (day, self._monthname[month],
+                                              year, hh, mm, ss)
         return s
 
     def address_string(self):
@@ -621,7 +617,7 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         a 204 preview response is sent. Otherwise a copy of the message
         is returned to the client.
         """
-        if '204' in self.allow or self.preview != None:
+        if '204' in self.allow or self.preview is not None:
             # We MUST read everything the client sent us
             if self.has_body:
                 # pdb.set_trace()
@@ -660,7 +656,7 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         a 204 preview response is sent. Otherwise a copy of the message
         is returned to the client.
         """
-        if '204' in self.allow or self.preview != None:
+        if '204' in self.allow or self.preview is not None:
             # We MUST read everything the client sent us
             if self.has_body:
                 while True:
@@ -697,7 +693,7 @@ class BaseICAPRequestHandler(SocketServer.StreamRequestHandler):
         a 204 preview response is sent. Otherwise a copy of the message
         is returned to the client.
         """
-        if '204' in self.allow or self.preview != None:
+        if '204' in self.allow or self.preview is not None:
             # We MUST read everything the client sent us
             if self.has_body:
                 while True:
