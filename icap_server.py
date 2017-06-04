@@ -108,7 +108,7 @@ class ICAPHandler(BaseICAPRequestHandler):
                 logger=my_logger,
                 cache=cache,
                 pass_mode=pass_mode)
-            my_logger.info("file blocked")
+            my_logger.info("file {} blocked".format(url))
             my_logger.close()
             return
 
