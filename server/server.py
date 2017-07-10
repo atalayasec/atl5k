@@ -202,7 +202,6 @@ def save_configuration():
             'iptables_forward_enabled': 'iptables_forward_enabled' in request.form and request.form['iptables_forward_enabled'] == 'on',
             'proxyEnabled': 'proxyOnOff' in request.form and request.form['proxyOnOff'] == 'on',
             'HTTPSEnabled': 'proxyHTTPS' in request.form and request.form['proxyHTTPS'] == 'on',
-            'sslBump': "sslBump" in request.form and request.form['sslBump'] == "on",
             'virustotal_api_key': request.form['virustotal_api_key'],
             'safebrowsing_api_key': request.form['safebrowsing_api_key'],
             'sandbox_username': request.form['sandbox_username'],
@@ -212,6 +211,9 @@ def save_configuration():
             'proxyPort': request.form['proxyPort'] if request.form['proxyPort'] else 3128,
             'proxyMode': request.form['proxyMode']
         }
+
+        live_config["sslBump"] = "sslBump" in request.form and request.form['sslBump'] == "on"
+        new_config["sslBump"] = live_config["sslBump"]
 
         # handling eth0
         if not new_config['eth0_dhcp_enabled']:
