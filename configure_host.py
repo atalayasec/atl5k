@@ -162,7 +162,7 @@ adaptation_access service_resp allow all
 visible_hostname {0}
 """.format(eth0_address)
 
-        if "sslBump" in new_config and new_config["sslBump"]:
+        if "sslBump" in new_config and new_config["sslBump"] not in ["False", False, None]:
             squid_base_config = squid_base_config + """
 http_port {0} ssl-bump generate-host-certificates=on dynamic_cert_mem_cache_size=128MB cert=/etc/squid/ssl_cert/CA.pem
 sslcrtd_program /usr/lib/squid/ssl_crtd -s /var/lib/ssl_db -M 128MB
