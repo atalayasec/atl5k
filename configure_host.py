@@ -159,7 +159,12 @@ icap_preview_size 1024
 icap_service service_resp respmod_precache icap://127.0.0.1:13440/response
 adaptation_access service_resp allow all
 
-http_port 3128 ssl-bump generate-host-certificates=on dynamic_cert_mem_cache_size=128MB cert=/etc/squid/ssl_cert/CA.pem
+visible_hostname {0}
+""".format(eth0_address)
+
+        if "sslBump" in new_config and new_config["sslBump"]:
+            squid_base_config = squid_base_config + """
+http_port {0} ssl-bump generate-host-certificates=on dynamic_cert_mem_cache_size=128MB cert=/etc/squid/ssl_cert/CA.pem
 sslcrtd_program /usr/lib/squid/ssl_crtd -s /var/lib/ssl_db -M 128MB
 sslproxy_options NO_SSLv2,NO_SSLv3,SINGLE_DH_USE,NO_SSLv2,NO_SSLv3,SINGLE_DH_USE,SINGLE_ECDH_USE
 sslproxy_cert_error allow all
@@ -168,8 +173,9 @@ acl step1 at_step SslBump1
 ssl_bump server-first all
 ssl_bump peek step1
 ssl_bump bump all
-
-visible_hostname {0}\n""".format(eth0_address)
+""".format(new_config['proxyPort'])
+        else:
+            squid_base_config = squid_base_config + "http_port {0}".format(new_config['proxyPort'])
 
         if 'HTTPSEnabled' in new_config and new_config['HTTPSEnabled']:
             squid_base_config += 'https_port ' + new_config['proxyPort'] + ' cert=/etc/ssl/cert.pem\n'

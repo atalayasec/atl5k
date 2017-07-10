@@ -202,6 +202,7 @@ def save_configuration():
             'iptables_forward_enabled': 'iptables_forward_enabled' in request.form and request.form['iptables_forward_enabled'] == 'on',
             'proxyEnabled': 'proxyOnOff' in request.form and request.form['proxyOnOff'] == 'on',
             'HTTPSEnabled': 'proxyHTTPS' in request.form and request.form['proxyHTTPS'] == 'on',
+            'sslBump': request.form['sslBump'],
             'virustotal_api_key': request.form['virustotal_api_key'],
             'safebrowsing_api_key': request.form['safebrowsing_api_key'],
             'sandbox_username': request.form['sandbox_username'],
