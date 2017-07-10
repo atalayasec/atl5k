@@ -175,12 +175,10 @@ ssl_bump peek step1
 ssl_bump bump all
 """.format(new_config['proxyPort'])
         else:
-            squid_base_config = squid_base_config + "http_port {0}".format(new_config['proxyPort'])
-
-        if 'HTTPSEnabled' in new_config and new_config['HTTPSEnabled']:
-            squid_base_config += 'https_port ' + new_config['proxyPort'] + ' cert=/etc/ssl/cert.pem\n'
-        else:
-            squid_base_config += 'http_port ' + new_config['proxyPort'] + '\n'
+            if 'HTTPSEnabled' in new_config and new_config['HTTPSEnabled']:
+                squid_base_config += 'https_port ' + new_config['proxyPort'] + ' cert=/etc/ssl/cert.pem\n'
+            else:
+                squid_base_config += 'http_port ' + new_config['proxyPort'] + '\n'
 
         squid = open('/etc/squid/squid.conf', 'w')
         squid.write(squid_base_config)
