@@ -212,7 +212,12 @@ def save_configuration():
             'proxyMode': request.form['proxyMode']
         }
 
-        live_config["sslBump"] = "sslBump" in request.form and request.form['sslBump'] == "on"
+        # TODO: rework boolean values in redis
+        sslBump = request.form.get("sslBump", "off")
+        if sslBump == "on":
+            live_config["sslBump"] = True
+        else:
+            live_config["sslBump"] = False
         new_config["sslBump"] = live_config["sslBump"]
 
         # handling eth0
