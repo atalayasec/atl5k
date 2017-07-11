@@ -136,7 +136,7 @@ def reload_complete_configuration(old_config, new_config):
             subprocess.call(['/sbin/iptables', '-F'])
 
     # squid handling
-    if 'proxyPort' in changes or 'HTTPSEnabled' in changes or 'HTTPSCertificate' in changes:
+    if 'proxyPort' in changes or 'HTTPSEnabled' in changes or 'HTTPSCertificate' in changes or "sslBump" in changes:
         if 'HTTPSCertificate' in changes and new_config['HTTPSCertificate']:
             certificate = new_config['HTTPSCertificate']
             cert = open('/etc/ssl/cert.pem', 'w')
