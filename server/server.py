@@ -212,6 +212,14 @@ def save_configuration():
             'proxyMode': request.form['proxyMode']
         }
 
+        # TODO: rework boolean values in redis
+        sslBump = request.form.get("sslBump", "off")
+        if sslBump == "on":
+            live_config["sslBump"] = True
+        else:
+            live_config["sslBump"] = False
+        new_config["sslBump"] = live_config["sslBump"]
+
         # handling eth0
         if not new_config['eth0_dhcp_enabled']:
             new_config['eth0_ip'] = request.form['eth0_ip_1'] + '.' + request.form['eth0_ip_2'] + \

@@ -55,6 +55,7 @@ def get_host_configuration():
     conf['syslogEnabled'] = live_config.get("syslogEnabled") not in [None, "False"]
     conf['syslogHost'] = live_config.get("syslogHost")
     conf['syslogPort'] = live_config.get("syslogPort")
+    conf["sslBump"] = live_config.get("sslBump") not in [None, "False"]
 
     # eth0
     try:

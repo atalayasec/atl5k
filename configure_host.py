@@ -136,7 +136,7 @@ def reload_complete_configuration(old_config, new_config):
             subprocess.call(['/sbin/iptables', '-F'])
 
     # squid handling
-    if 'proxyPort' in changes or 'HTTPSEnabled' in changes or 'HTTPSCertificate' in changes:
+    if 'proxyPort' in changes or 'HTTPSEnabled' in changes or 'HTTPSCertificate' in changes or "sslBump" in changes:
         if 'HTTPSCertificate' in changes and new_config['HTTPSCertificate']:
             certificate = new_config['HTTPSCertificate']
             cert = open('/etc/ssl/cert.pem', 'w')
@@ -159,7 +159,12 @@ icap_preview_size 1024
 icap_service service_resp respmod_precache icap://127.0.0.1:13440/response
 adaptation_access service_resp allow all
 
-http_port 3128 ssl-bump generate-host-certificates=on dynamic_cert_mem_cache_size=128MB cert=/etc/squid/ssl_cert/CA.pem
+visible_hostname {0}
+""".format(eth0_address)
+
+        if "sslBump" in new_config and new_config["sslBump"] not in ["False", False, None]:
+            squid_base_config = squid_base_config + """
+http_port {0} ssl-bump generate-host-certificates=on dynamic_cert_mem_cache_size=128MB cert=/etc/squid/ssl_cert/CA.pem
 sslcrtd_program /usr/lib/squid/ssl_crtd -s /var/lib/ssl_db -M 128MB
 sslproxy_options NO_SSLv2,NO_SSLv3,SINGLE_DH_USE,NO_SSLv2,NO_SSLv3,SINGLE_DH_USE,SINGLE_ECDH_USE
 sslproxy_cert_error allow all
@@ -168,13 +173,12 @@ acl step1 at_step SslBump1
 ssl_bump server-first all
 ssl_bump peek step1
 ssl_bump bump all
-
-visible_hostname {0}\n""".format(eth0_address)
-
-        if 'HTTPSEnabled' in new_config and new_config['HTTPSEnabled']:
-            squid_base_config += 'https_port ' + new_config['proxyPort'] + ' cert=/etc/ssl/cert.pem\n'
+""".format(new_config['proxyPort'])
         else:
-            squid_base_config += 'http_port ' + new_config['proxyPort'] + '\n'
+            if 'HTTPSEnabled' in new_config and new_config['HTTPSEnabled']:
+                squid_base_config += 'https_port ' + new_config['proxyPort'] + ' cert=/etc/ssl/cert.pem\n'
+            else:
+                squid_base_config += 'http_port ' + new_config['proxyPort'] + '\n'
 
         squid = open('/etc/squid/squid.conf', 'w')
         squid.write(squid_base_config)
