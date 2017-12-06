@@ -9,7 +9,7 @@ import multiprocessing
 
 class PhishTank(multiprocessing.Process, NamedLogger):
     __logname__ = "phishtank"
-    FILE_URL = "http://data.phishtank.com/data/{}/online-valid.json.bz2"
+    FILE_URL = "https://data.phishtank.com/data/{}/online-valid.json.bz2"
 
     def __init__(self, cache, config):
         multiprocessing.Process.__init__(self)
