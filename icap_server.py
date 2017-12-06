@@ -83,7 +83,7 @@ class ICAPHandler(BaseICAPRequestHandler):
             pass_mode=pass_mode)
 
         if block:
-            my_logger.info("ip {} blocked".format(url))
+            my_logger.info("ip {} blocked (requester: {})".format(url, self.client_address[0]))
             my_logger.close()
             return
 
@@ -97,7 +97,7 @@ class ICAPHandler(BaseICAPRequestHandler):
             pass_mode=pass_mode)
 
         if block:
-            my_logger.info("domain {} blocked".format(url))
+            my_logger.info("domain {} blocked (requester: {})".format(url, self.client_address[0]))
             my_logger.close()
             return
 
@@ -109,7 +109,7 @@ class ICAPHandler(BaseICAPRequestHandler):
                 cache=cache,
                 pass_mode=pass_mode)
             if block:
-                my_logger.info("file {} blocked".format(url))
+                my_logger.info("file {} malicious (requester: {})".format(url, self.client_address[0]))
                 # this commented out to fallthrough and not adapt the request
                 #my_logger.close()
                 #return
