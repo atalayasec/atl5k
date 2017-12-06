@@ -108,9 +108,11 @@ class ICAPHandler(BaseICAPRequestHandler):
                 logger=my_logger,
                 cache=cache,
                 pass_mode=pass_mode)
-            my_logger.info("file {} blocked".format(url))
-            my_logger.close()
-            return
+            if block:
+                my_logger.info("file {} blocked".format(url))
+                # this commented out to fallthrough and not adapt the request
+                #my_logger.close()
+                #return
 
         my_logger.close()
         self.no_adaptation_required()
